@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "iostream"
 
-#define iter 4
+#define iter 3
 #include "FluidCube2D.h"
 #include "math.h"
 
@@ -27,8 +27,6 @@ FluidCube2D::FluidCube2D(float diffusion, float viscosity, float dt){
 
 void FluidCube2D::FluidCubeAddDensity(int x, int y, float amount){
     this->density[IX(x,y)] += amount;
-
-
 }
 
 void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amountY){

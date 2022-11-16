@@ -14,7 +14,7 @@ int main()
 {
 //    mode, window title name, style(what functions to include in title bar)
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Window", sf::Style::Close | sf::Style::Titlebar); //| sf::Style::Resize);
-    window.setFramerateLimit(10);
+    window.setFramerateLimit(15);
 
     FluidCube cube(0.1,0, 0.0001);
 
@@ -27,6 +27,8 @@ int main()
 
 // create loop for window to stay open
     float last_max =  255;
+    int prev_x = 0;
+    int prev_y = 0;
     while (window.isOpen()){
 
         float current_max=0;
@@ -52,8 +54,7 @@ int main()
             }
         }
 
-        int prev_x = 0;
-        int prev_y = 0;
+
 
 
 //        window activities
@@ -66,19 +67,23 @@ int main()
                     break;
             }
             sf::Vector2i pos = sf::Mouse::getPosition(window);
-            int x = pos.x;
-            int y = pos.y;
+
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                cube.FluidCubeAddDensity(int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h) , 200);
 
-                int VelX =  x - prev_x;
-                int VelY =  y - prev_y;
+                cube.FluidCubeAddDensity(int(float(pos.x)/WINDOW_SIZE * w), int(float(pos.y)/WINDOW_SIZE * h) , 400);
+
+
+                int VelX =  pos.x - prev_x;
+                int VelY =  pos.y - prev_y;
+
+//                printf("%d, %d\n", VelX, VelY);
+                printf("%d, %d\n", pos.y, prev_y);
                 int SCALE = 1000;
-                cube.FluidCubeAddVelocity(int(float(x)/WINDOW_SIZE * w),int(float(y)/WINDOW_SIZE * h), SCALE * VelX, SCALE * VelY);
+                cube.FluidCubeAddVelocity(int(float(pos.x)/WINDOW_SIZE * w),int(float(pos.y)/WINDOW_SIZE * h), SCALE * VelX, -SCALE * VelY);
 //                    printf("%d, %d\n", int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h));
 //                std::cout << cube.density[int(float(x)/WINDOW_SIZE * w) + w* int(float(y)/WINDOW_SIZE * h)] << std::endl;
-                prev_x = x; prev_y = y;
+                prev_x = pos.x; prev_y = pos.y;
             }
 
         }
