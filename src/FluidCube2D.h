@@ -5,7 +5,7 @@
 #ifndef FLUID_SIMULATION_FLUIDCUBE3D_H
 #define FLUID_SIMULATION_FLUIDCUBE3D_H
 #define WINDOW_SIZE 1024
-#define SIZE 60
+#define SIZE 32
 #define IX(x, y) (x + y * SIZE)
 
 typedef struct FluidCube2D {
@@ -13,26 +13,26 @@ typedef struct FluidCube2D {
     float diff; //diffusion
     float visc; //viscosity
 
-    int* s;
-    int* density; //density of dye
+    float* s;
+    float* density; //density of dye
 
-    int* Vx;
-    int* Vy;
+    float* Vx;
+    float* Vy;
 
-    int* Vx0;//keep old values
-    int* Vy0;//keep old values
+    float* Vx0;//keep old values
+    float* Vy0;//keep old values
 
     FluidCube2D(float diffusion, float viscosity, float dt);
     void FluidCubeAddDensity(int x, int y, float amount);
     void FluidCubeAddVelocity(int x, int y,  float amountX, float amountY);
 
-    void set_bnd(int b, int* x); //prevent fluid overflowing at boundaries
-    void lin_solve(int b, int* x, int* x0, float a, float c); //solving linear equations of new cell values
+    void set_bnd(int b, float* x); //prevent fluid overflowing at boundaries
+    void lin_solve(int b, float* x, float* x0, float a, float c); //solving linear equations of new cell values
 
 
-    void diffuse(int b, int*x, int* x0, float diff, float dt);
-    void project(int *velocX, int *velocY, int *p, int *div); //incompressible flow
-    void advect(int b, int *d, int *d0,  int *velocX, int *velocY, float dt);
+    void diffuse(int b, float*x, float* x0, float diff, float dt);
+    void project(float *velocX, float *velocY, float *p, float *div); //incompressible flow
+    void advect(int b, float *d, float *d0,  float *velocX, float *velocY, float dt);
     void FluidCubeStep();
 
 

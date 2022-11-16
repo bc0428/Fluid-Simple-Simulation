@@ -14,9 +14,9 @@ int main()
 {
 //    mode, window title name, style(what functions to include in title bar)
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Window", sf::Style::Close | sf::Style::Titlebar); //| sf::Style::Resize);
-    window.setFramerateLimit(6);
+    window.setFramerateLimit(10);
 
-    FluidCube cube(1,1,0.00000000001);
+    FluidCube cube(0.1,0, 0.0001);
 
     sf::Texture texture;
     texture.create(w,h);
@@ -26,20 +26,34 @@ int main()
     sf::Uint8* pixels = new sf::Uint8 [h * w * 4];
 
 // create loop for window to stay open
+    float last_max =  255;
     while (window.isOpen()){
 
+        float current_max=0;
 
         for (int i=0; i< h; i++){
             for (int j=0; j<w; j++){
-                pixels[(i*w + j)*4]    = (sf::Uint8)(std::min(cube.density[i*w + j], 255));
-                pixels[(i*w + j)*4 +1] = (sf::Uint8)(std::min(cube.density[i*w + j], 255));
-                pixels[(i*w + j)*4 +2] = (sf::Uint8)(std::min(cube.density[i*w + j], 255));
-                pixels[(i*w + j)*4 +3] = (sf::Uint8)255;
+
+                current_max = cube.density[i*w + j] > current_max?  cube.density[i+w+j]: current_max;
+
+//                pixels[(i*w + j)*4]    = (sf::Uint8)(std::min(int(255*(cube.density[i*w + j] / last_max)), 255));
+//                pixels[(i*w + j)*4 +1] = (sf::Uint8)(std::min(int(255*(cube.density[i*w + j] / last_max)), 255));
+//                pixels[(i*w + j)*4 +2] = (sf::Uint8)(std::min(int(255*(cube.density[i*w + j] / last_max)), 255));
+
+//                pixels[(i*w + j)*4]    = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
+//                pixels[(i*w + j)*4 +1] = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
+//                pixels[(i*w + j)*4 +2] = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
+
+                pixels[(i*w + j)*4]    = (sf::Uint8)255;
+                pixels[(i*w + j)*4 +1] = (sf::Uint8)255;
+                pixels[(i*w + j)*4 +2] = (sf::Uint8)255;
+
+                pixels[(i*w + j)*4 +3] = cube.density[i*w + j];
             }
         }
 
-        float prev_x = 0;
-        float prev_y = 0;
+        int prev_x = 0;
+        int prev_y = 0;
 
 
 //        window activities
@@ -50,21 +64,23 @@ int main()
                 case sf::Event::Closed:
                     window.close();
                     break;
-                case sf::Event::MouseButtonPressed:
-                    sf::Vector2i pos = sf::Mouse::getPosition(window);
-                    int x = pos.x;
-                    int y = pos.y;
-
-                    cube.FluidCubeAddDensity(int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h) , 100);
-                    int VelX =  x - prev_x;
-                    int VelY =  y - prev_y;
-//                    cube.FluidCubeAddVelocity(int(float(x)/WINDOW_SIZE * w),int(float(y)/WINDOW_SIZE * h), VelX, VelY);
-
-                    printf("%d, %d\n", int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h));
-//                    cube.density[int(float(x)/WINDOW_SIZE * w) + w* int(float(y)/WINDOW_SIZE * h)] = 255;
-
-                    prev_x = x; prev_y = y;
             }
+            sf::Vector2i pos = sf::Mouse::getPosition(window);
+            int x = pos.x;
+            int y = pos.y;
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                cube.FluidCubeAddDensity(int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h) , 200);
+
+                int VelX =  x - prev_x;
+                int VelY =  y - prev_y;
+                int SCALE = 1000;
+                cube.FluidCubeAddVelocity(int(float(x)/WINDOW_SIZE * w),int(float(y)/WINDOW_SIZE * h), SCALE * VelX, SCALE * VelY);
+//                    printf("%d, %d\n", int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h));
+//                std::cout << cube.density[int(float(x)/WINDOW_SIZE * w) + w* int(float(y)/WINDOW_SIZE * h)] << std::endl;
+                prev_x = x; prev_y = y;
+            }
+
         }
         cube.FluidCubeStep();
 
@@ -73,5 +89,8 @@ int main()
         sprite.setTexture(texture);
         window.draw(sprite);
         window.display();
+
+        last_max = current_max;
+        current_max = 0;
     }
 }

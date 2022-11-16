@@ -15,18 +15,20 @@ FluidCube2D::FluidCube2D(float diffusion, float viscosity, float dt){
     this->diff = diffusion;
     this->visc = viscosity;
 
-    this->s =       (int*)std::calloc(SIZE * SIZE, sizeof(float));
-    this->density = (int*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->s =       (float*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->density = (float*)std::calloc(SIZE * SIZE, sizeof(float));
 
-    this->Vx =      (int*)std::calloc(SIZE * SIZE, sizeof(float));
-    this->Vy =      (int*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->Vx =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->Vy =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
 
-    this->Vx0 =     (int*)std::calloc(SIZE * SIZE, sizeof(float));
-    this->Vy0 =     (int*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->Vx0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
+    this->Vy0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
 }
 
 void FluidCube2D::FluidCubeAddDensity(int x, int y, float amount){
     this->density[IX(x,y)] += amount;
+
+
 }
 
 void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amountY){
@@ -36,7 +38,7 @@ void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amount
     this->Vy[index] += amountY;
 }
 
-void FluidCube2D::set_bnd(int b, int* x){
+void FluidCube2D::set_bnd(int b, float* x){
 // bouncing off the walls
         for(int i = 1; i < SIZE - 1; i++) {
             x[IX(i, 0  )] = b == 2 ? -x[IX(i, 1  )] : x[IX(i, 1  )];
@@ -55,7 +57,7 @@ void FluidCube2D::set_bnd(int b, int* x){
 
 }
 
-void FluidCube2D::lin_solve(int b, int* x, int* x0, float a, float c){
+void FluidCube2D::lin_solve(int b, float* x, float* x0, float a, float c){
     float cRecip = 1.0/c;
 
     for (int k=0; k<iter; k++){
@@ -75,17 +77,17 @@ void FluidCube2D::lin_solve(int b, int* x, int* x0, float a, float c){
 }
 
 
-void FluidCube2D::diffuse(int b, int*x, int* x0, float diff, float dt){
+void FluidCube2D::diffuse(int b, float*x, float* x0, float diff, float dt){
     float a = dt * diff * (SIZE - 2) * (SIZE - 2);
     lin_solve(b,x,x0, a,1+6*a);
 }
 
-void FluidCube2D::project(int *velocX, int *velocY, int *p, int *div)
+void FluidCube2D::project(float *velocX, float *velocY, float *p, float *div)
 {
         for (int j = 1; j < SIZE - 1; j++) {
             for (int i = 1; i < SIZE - 1; i++) {
                 div[IX(i, j)] = -0.5f * (
-                        velocX[IX(i+1, j)]
+                         velocX[IX(i+1, j)]
                         -velocX[IX(i-1, j)]
                         +velocY[IX(i , j+1)]
                         -velocY[IX(i , j-1)]
@@ -97,7 +99,7 @@ void FluidCube2D::project(int *velocX, int *velocY, int *p, int *div)
     set_bnd(0, p);
     lin_solve(0, p, div, 1, 6);
 
-    for (int k = 1; k < SIZE - 1; k++) {
+
         for (int j = 1; j < SIZE - 1; j++) {
             for (int i = 1; i < SIZE - 1; i++) {
                 velocX[IX(i, j)] -= 0.5f * (  p[IX(i+1, j)]
@@ -106,12 +108,12 @@ void FluidCube2D::project(int *velocX, int *velocY, int *p, int *div)
                                               -p[IX(i, j-1)]) * SIZE;
             }
         }
-    }
+
     set_bnd(1, velocX);
     set_bnd(2, velocY);
 }
 
-void FluidCube2D::advect(int b, int *d, int *d0, int *velocX, int *velocY, float dt)
+void FluidCube2D::advect(int b, float *d, float *d0, float *velocX, float *velocY, float dt)
 {
     float i0, i1, j0, j1;
 
@@ -164,14 +166,14 @@ void FluidCube2D::FluidCubeStep(){
     float diff = this->diff;
     float dt = this->dt;
 
-    int* Vx = this->Vx;
-    int* Vy = this->Vy;
+    float* Vx = this->Vx;
+    float* Vy = this->Vy;
 
-    int* Vx0 = this->Vx0;
-    int* Vy0 = this->Vy0;
+    float* Vx0 = this->Vx0;
+    float* Vy0 = this->Vy0;
 
-    int* s = this->s;
-    int* density = this->density;
+    float* s = this->s;
+    float* density = this->density;
 
     diffuse(1, Vx0, Vx, visc, dt);
     diffuse(2, Vy0, Vy, visc, dt);
