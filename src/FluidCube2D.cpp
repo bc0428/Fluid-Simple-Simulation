@@ -136,6 +136,7 @@ void FluidCube2D::advect(int b, float *d, float *d0, float *velocX, float *veloc
                 if(x > Nfloat + 0.5f) x = Nfloat + 0.5f;
                 i0 = floorf(x);
                 i1 = i0 + 1.0f;
+
                 if(y < 0.5f) y = 0.5f;
                 if(y > Nfloat + 0.5f) y = Nfloat + 0.5f;
                 j0 = floorf(y);
@@ -186,10 +187,3 @@ void FluidCube2D::FluidCubeStep(){
     diffuse(0, s, density, diff, dt);
     advect(0,density, s,Vx,Vy,dt);
 }
-
-void FluidCube2D::test() {
-    this->density[0] += 1;
-    std::cout << this->density[0] << std::endl;
-    sleep(2);
-}
-

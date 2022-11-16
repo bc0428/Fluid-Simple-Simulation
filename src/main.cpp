@@ -80,7 +80,7 @@ int main()
 //                printf("%d, %d\n", VelX, VelY);
                 printf("%d, %d\n", pos.y, prev_y);
                 int SCALE = 1000;
-                cube.FluidCubeAddVelocity(int(float(pos.x)/WINDOW_SIZE * w),int(float(pos.y)/WINDOW_SIZE * h), SCALE * VelX, -SCALE * VelY);
+                cube.FluidCubeAddVelocity(int(float(pos.x)/WINDOW_SIZE * w),int(float(pos.y)/WINDOW_SIZE * h), SCALE * VelX, SCALE * VelY);
 //                    printf("%d, %d\n", int(float(x)/WINDOW_SIZE * w), int(float(y)/WINDOW_SIZE * h));
 //                std::cout << cube.density[int(float(x)/WINDOW_SIZE * w) + w* int(float(y)/WINDOW_SIZE * h)] << std::endl;
                 prev_x = pos.x; prev_y = pos.y;

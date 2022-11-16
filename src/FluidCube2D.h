@@ -36,7 +36,7 @@ typedef struct FluidCube2D {
     void FluidCubeStep();
 
 
-    void test();
+
 }FluidCube;
 
 
