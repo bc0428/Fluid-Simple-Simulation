@@ -5,7 +5,7 @@
 #ifndef FLUID_SIMULATION_FLUIDCUBE3D_H
 #define FLUID_SIMULATION_FLUIDCUBE3D_H
 #define WINDOW_SIZE 1024
-#define SIZE 32
+#define SIZE 64
 #define IX(x, y) (x + y * SIZE)
 
 typedef struct FluidCube2D {

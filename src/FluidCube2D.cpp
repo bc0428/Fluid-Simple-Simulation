@@ -17,9 +17,18 @@ FluidCube2D::FluidCube2D(float diffusion, float viscosity, float dt){
 
     this->s =       (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->density = (float*)std::calloc(SIZE * SIZE, sizeof(float));
+    for (int i=0; i<SIZE*SIZE; i++){
+        s[i] = 0;
+        density[i] = 0;
+    }
 
     this->Vx =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->Vy =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
+//    for (int i=0; i<SIZE*SIZE; i++){
+//        Vx[i] = 5;
+//        Vy[i] = 5;
+//    }
+
 
     this->Vx0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->Vy0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
@@ -27,6 +36,7 @@ FluidCube2D::FluidCube2D(float diffusion, float viscosity, float dt){
 
 void FluidCube2D::FluidCubeAddDensity(int x, int y, float amount){
     this->density[IX(x,y)] += amount;
+
 }
 
 void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amountY){
@@ -34,12 +44,13 @@ void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amount
 
     this->Vx[index] += amountX;
     this->Vy[index] += amountY;
+
 }
 
 void FluidCube2D::set_bnd(int b, float* x){
 // bouncing off the walls
         for(int i = 1; i < SIZE - 1; i++) {
-            x[IX(i, 0  )] = b == 2 ? -x[IX(i, 1  )] : x[IX(i, 1  )];
+            x[IX(i, 0  )] = b == 2 ? -x[IX(i, 1)] : x[IX(i, 1)];
             x[IX(i, SIZE - 1)] = b == 2 ? -x[IX(i, SIZE - 2)] : x[IX(i, SIZE - 2)];
         }
         for(int j = 1; j < SIZE - 1; j++) {
