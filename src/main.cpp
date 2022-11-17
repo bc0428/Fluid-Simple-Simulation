@@ -2,8 +2,6 @@
 // Created by Brian Cheng on 14/11/2022.
 //
 
-#include <unistd.h>
-#include <cfloat>
 #include "FluidCube2D.h"
 #include "iostream"
 #include "math.h"
@@ -20,8 +18,10 @@ int main()
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Window", sf::Style::Close | sf::Style::Titlebar); //| sf::Style::Resize);
     window.setFramerateLimit(120);
 
-    FluidCube cube(0.00000000000001,0, 0.0005);
+//    model parameters
+    FluidCube2D cube(0.00000000000001,0, 0.0005);
 
+//    create pixel array
     sf::Texture texture;
     texture.create(w,h);
 
@@ -39,14 +39,14 @@ int main()
     while (window.isOpen()){
         for (int i=0; i< h; i++){
             for (int j=0; j<w; j++){
+//                RGB set as constant 255
                 pixels[(i*w + j)*4] = pixels[(i*w + j)*4 +1] = pixels[(i*w + j)*4 +2] = (sf::Uint8)255;
 
+//                deal with strange pixel behavior, possibly caused by random trash values during declaration
                 if (isnan(cube.density[i*w + j])){cube.density[i*w + j] = 0;}
-//                if (abs(cube.density[i*w + j]) > std::numeric_limits<uint16_t>::max() or cube.density[i*w + j] < 0){cube.density[i*w + j] = 0;}
-if (prev_x==0 and prev_y == 0 and cube.density[i*w + j] != 0){
-    cube.density[i*w + j] = 0;
-}
+                if (prev_x==0 and prev_y == 0 and cube.density[i*w + j] != 0){cube.density[i*w + j] = 0;}
 
+//                pixel density used as A in RGBA
                 int level = (int)(cube.density[i*w + j]);
                 pixels[(i*w + j)*4 +3] = (sf::Uint8)std::min(abs(level), 255);
             }
@@ -67,28 +67,27 @@ if (prev_x==0 and prev_y == 0 and cube.density[i*w + j] != 0){
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 sf::Vector2i pos = sf::Mouse::getPosition(window);
-//                int pixel_x = pos.x == NAN? 0 : int(float(pos.x)/WINDOW_SIZE * w);
-//                int pixel_y = pos.y == NAN? 0 : int(float(pos.y)/WINDOW_SIZE * h);
                 int pixel_x = int(float(pos.x)/WINDOW_SIZE * w);
                 int pixel_y = int(float(pos.y)/WINDOW_SIZE * h);
 
                 int x = std::max(lower_bound, std::min(pixel_x, upper_bound));
                 int y = std::max(lower_bound, std::min(pixel_y, upper_bound));
 
+//              add density when muose pressed
                 cube.FluidCubeAddDensity(x, y , SIZE*10);
 
                 int VelX =  pos.x - prev_x;
                 int VelY =  pos.y - prev_y;
 
-                printf("Vx: %d, Vy: %d D: %f\n", VelX, VelY, cube.density[IX(pixel_x, pixel_y)]);
+//              add velocity when mouse dragged
                 int SCALE = 50;
                 cube.FluidCubeAddVelocity(x,y, SCALE * VelX, SCALE * VelY);
-
 
                 prev_x = pos.x; prev_y = pos.y;
             }
 
         }
+
         cube.FluidCubeStep();
         cube.fadeout();
 

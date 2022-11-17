@@ -2,8 +2,8 @@
 // Created by Brian Cheng on 14/11/2022.
 //
 
-#ifndef FLUID_SIMULATION_FLUIDCUBE3D_H
-#define FLUID_SIMULATION_FLUIDCUBE3D_H
+#ifndef FLUID_SIMULATION_FLUIDCUBE2D_H
+#define FLUID_SIMULATION_FLUIDCUBE2D_H
 #define WINDOW_SIZE 1024
 #define SIZE 64
 #define IX(x, y) (x + y * SIZE)
@@ -38,7 +38,7 @@ typedef struct FluidCube2D {
     void fadeout();
 
 
-}FluidCube;
+}FluidCube2D;
 
 
-#endif //FLUID_SIMULATION_FLUIDCUBE3D_H
+#endif //FLUID_SIMULATION_FLUIDCUBE2D_H

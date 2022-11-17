@@ -3,7 +3,6 @@
 //
 #include <unistd.h>
 #include "iostream"
-
 #define iter 4
 #include "FluidCube2D.h"
 #include "math.h"
@@ -42,6 +41,7 @@ void FluidCube2D::FluidCubeAddVelocity(int x, int y, float amountX, float amount
 
 }
 
+// when reaching edges and corners
 void FluidCube2D::set_bnd(int b, float* x){
 // bouncing off the walls
         for(int i = 1; i < SIZE - 1; i++) {
@@ -53,7 +53,7 @@ void FluidCube2D::set_bnd(int b, float* x){
             x[IX(SIZE - 1, j)] = b == 1 ? -x[IX(SIZE - 2, j)] : x[IX(SIZE - 2, j)];
         }
 
-// corners
+// bouncing off corners
     x[IX(0, 0)]       = 0.5f * (x[IX(1, 0)] + x[IX(0, 1)]);
     x[IX(0, SIZE - 1)]     = 0.5f * (x[IX(1, SIZE - 1)] + x[IX(0, SIZE - 2)]);
     x[IX(SIZE - 1, 0)]     = 0.5f * (x[IX(SIZE - 2, 0)] + x[IX(SIZE - 1, 1)]);
@@ -61,6 +61,7 @@ void FluidCube2D::set_bnd(int b, float* x){
 
 }
 
+// solving linear equations
 void FluidCube2D::lin_solve(int b, float* x, float* x0, float a, float c){
     float cRecip = 1.0/c;
 
@@ -80,12 +81,13 @@ void FluidCube2D::lin_solve(int b, float* x, float* x0, float a, float c){
     }
 }
 
-
+// apply diffusion
 void FluidCube2D::diffuse(int b, float*x, float* x0, float diff, float dt){
     float a = dt * diff * (SIZE - 2) * (SIZE - 2);
     lin_solve(b,x,x0, a,1+6*a);
 }
 
+// moving the fluid
 void FluidCube2D::project(float *velocX, float *velocY, float *p, float *div)
 {
         for (int j = 1; j < SIZE - 1; j++) {
@@ -117,6 +119,7 @@ void FluidCube2D::project(float *velocX, float *velocY, float *p, float *div)
     set_bnd(2, velocY);
 }
 
+// applying advection
 void FluidCube2D::advect(int b, float *d, float *d0, float *velocX, float *velocY, float dt)
 {
     float i0, i1, j0, j1;
@@ -166,6 +169,7 @@ void FluidCube2D::advect(int b, float *d, float *d0, float *velocX, float *veloc
     set_bnd(b, d);
 }
 
+// perform methods per timestep
 void FluidCube2D::FluidCubeStep(){
     float visc = this->visc;
     float diff = this->diff;
@@ -194,6 +198,7 @@ void FluidCube2D::FluidCubeStep(){
     advect(0,density, s,Vx,Vy,dt);
 }
 
+// using discount factor to apply fadeout, prevent bloated pixels
 void FluidCube2D::fadeout() {
     for (int i =0; i< SIZE*SIZE; i++){
         if (this->density[i] > 255){
