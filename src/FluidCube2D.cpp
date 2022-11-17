@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "iostream"
 
-#define iter 3
+#define iter 4
 #include "FluidCube2D.h"
 #include "math.h"
 
@@ -18,17 +18,12 @@ FluidCube2D::FluidCube2D(float diffusion, float viscosity, float dt){
     this->s =       (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->density = (float*)std::calloc(SIZE * SIZE, sizeof(float));
     for (int i=0; i<SIZE*SIZE; i++){
-        s[i] = 0;
-        density[i] = 0;
+        s[i] = 0.0;
+        density[i] = 0.0;
     }
 
     this->Vx =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->Vy =      (float*)std::calloc(SIZE * SIZE, sizeof(float));
-//    for (int i=0; i<SIZE*SIZE; i++){
-//        Vx[i] = 5;
-//        Vy[i] = 5;
-//    }
-
 
     this->Vx0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
     this->Vy0 =     (float*)std::calloc(SIZE * SIZE, sizeof(float));
@@ -197,4 +192,12 @@ void FluidCube2D::FluidCubeStep(){
 
     diffuse(0, s, density, diff, dt);
     advect(0,density, s,Vx,Vy,dt);
+}
+
+void FluidCube2D::fadeout() {
+    for (int i =0; i< SIZE*SIZE; i++){
+        if (this->density[i] > 255){
+            this->density[i] *=0.8;
+        }
+    }
 }

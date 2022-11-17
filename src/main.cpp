@@ -27,7 +27,8 @@ int main()
 
     sf::Sprite sprite(texture);
     sprite.scale(WINDOW_SIZE / SIZE, WINDOW_SIZE / SIZE);
-    sf::Uint8* pixels = new sf::Uint8 [h * w * 4];
+    sf::Uint8* pixels =  (sf::Uint8*) calloc(h * w * 4, sizeof(float));
+
 
 
 // create loop for window to stay open
@@ -35,36 +36,19 @@ int main()
     int prev_x = 0;
     int prev_y = 0;
 
-    int theta = 0;
     while (window.isOpen()){
-
-        float current_max=0;
-
         for (int i=0; i< h; i++){
             for (int j=0; j<w; j++){
-
-
-                current_max = cube.density[i*w + j] > current_max?  cube.density[i+w+j]: current_max;
-
                 pixels[(i*w + j)*4] = pixels[(i*w + j)*4 +1] = pixels[(i*w + j)*4 +2] = (sf::Uint8)255;
 
-//                pixels[(i*w + j)*4]    = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
-//                pixels[(i*w + j)*4 +1] = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
-//                pixels[(i*w + j)*4 +2] = (sf::Uint8)std::max(int(cube.density[i*w + j]), 50);
-
-//                pixels[(i*w + j)*4]    = (sf::Uint8)255;
-//                pixels[(i*w + j)*4 +1] = (sf::Uint8)255;
-//                pixels[(i*w + j)*4 +2] = (sf::Uint8)255;
-
-//                if (cube.density[i*w + j] > std::numeric_limits<uint8_t>::max()) {cube.density[i*w + j] = 0;}
-//                if (cube.density[i*w + j] == NAN) {cube.density[i*w + j] = 0;}
-
-//                int level = (int)((cube.density[i*w + j]+2) / last_max * 255);
-
                 if (isnan(cube.density[i*w + j])){cube.density[i*w + j] = 0;}
+//                if (abs(cube.density[i*w + j]) > std::numeric_limits<uint16_t>::max() or cube.density[i*w + j] < 0){cube.density[i*w + j] = 0;}
+if (prev_x==0 and prev_y == 0 and cube.density[i*w + j] != 0){
+    cube.density[i*w + j] = 0;
+}
 
                 int level = (int)(cube.density[i*w + j]);
-                pixels[(i*w + j)*4 +3] = (sf::Uint8)std::min(level, 255);
+                pixels[(i*w + j)*4 +3] = (sf::Uint8)std::min(abs(level), 255);
             }
         }
 
@@ -81,12 +65,12 @@ int main()
                     break;
             }
 
-
-
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 sf::Vector2i pos = sf::Mouse::getPosition(window);
-                int pixel_x = pos.x == NAN? 0 : int(float(pos.x)/WINDOW_SIZE * w);
-                int pixel_y = pos.y == NAN? 0 : int(float(pos.y)/WINDOW_SIZE * h);
+//                int pixel_x = pos.x == NAN? 0 : int(float(pos.x)/WINDOW_SIZE * w);
+//                int pixel_y = pos.y == NAN? 0 : int(float(pos.y)/WINDOW_SIZE * h);
+                int pixel_x = int(float(pos.x)/WINDOW_SIZE * w);
+                int pixel_y = int(float(pos.y)/WINDOW_SIZE * h);
 
                 int x = std::max(lower_bound, std::min(pixel_x, upper_bound));
                 int y = std::max(lower_bound, std::min(pixel_y, upper_bound));
@@ -105,39 +89,13 @@ int main()
             }
 
         }
-//        sf::Vector2i pos = sf::Mouse::getPosition(window);
-//        int R = 200;
-//        float xs = R*cos(theta/360.0 * 2*3.14);
-//        float ys = R*sin(theta/360.0 * 2*3.14);
-//
-//
-//        int pixel_x = int(float(xs + WINDOW_SIZE/2)/WINDOW_SIZE * w);
-//        int pixel_y = int(float(ys + WINDOW_SIZE/2)/WINDOW_SIZE * h);
-//
-//        int x = std::max(lower_bound, std::min(pixel_x, upper_bound));
-//        int y = std::max(lower_bound, std::min(pixel_y, upper_bound));
-//
-//        cube.FluidCubeAddDensity(x, y , SIZE*10);
-//
-//        int VelX =  pos.x - prev_x;
-//        int VelY =  pos.y - prev_y;
-
-//        printf("Vx: %d, Vy: %d D: %f\n", VelX, VelY, cube.density[IX(int(float(pos.x)/WINDOW_SIZE * w), int(float(pos.y)/WINDOW_SIZE * h))]);
-//        int SCALE = 500;
-//        cube.FluidCubeAddVelocity(x,y, SCALE * VelX, SCALE * VelY);
-//
-//        prev_x = pos.x; prev_y = pos.y;
-//        theta+=3;
-
         cube.FluidCubeStep();
+        cube.fadeout();
 
         window.clear();
         texture.update(pixels);
         sprite.setTexture(texture);
         window.draw(sprite);
         window.display();
-
-        last_max = current_max;
-        current_max = 0;
     }
 }

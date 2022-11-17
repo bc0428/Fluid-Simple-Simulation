@@ -35,6 +35,7 @@ typedef struct FluidCube2D {
     void advect(int b, float *d, float *d0,  float *velocX, float *velocY, float dt);
     void FluidCubeStep();
 
+    void fadeout();
 
 
 }FluidCube;
